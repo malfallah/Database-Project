@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Safe Hands DB</title>
+    <meta
+      name="description"
+      content="A relational database for a fictional insurance company, running as PostgreSQL 18 inside your browser. Run the ten business scenarios, browse the tables, or write your own SQL."
+    />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-row">
+        <div>
+          <h1>Safe Hands DB</h1>
+          <p class="tagline">
+            An insurance-company database, running as real PostgreSQL&nbsp;18 inside this tab. Nothing is sent to a
+            server.
+          </p>
+        </div>
+        <div class="header-actions">
+          <p id="status" class="status" role="status" aria-live="polite">
+            <span class="dot" aria-hidden="true"></span><span id="status-text">Starting PostgreSQL…</span>
+          </p>
+          <button id="reset" type="button" class="button secondary" disabled>Reset data</button>
+          <a id="repo-link" class="button secondary" href="https://github.com/malfallah/Database-Project">Source</a>
+        </div>
+      </div>
+      <nav class="wrap tabs" aria-label="Sections">
+        <button type="button" class="tab" data-view="scenarios" aria-pressed="true">Scenarios</button>
+        <button type="button" class="tab" data-view="tables" aria-pressed="false">Tables</button>
+        <button type="button" class="tab" data-view="sql" aria-pressed="false">SQL console</button>
+        <button type="button" class="tab" data-view="schema" aria-pressed="false">Schema</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <section id="view-scenarios" class="view" aria-labelledby="scenarios-heading">
+        <h2 id="scenarios-heading" class="visually-hidden">Scenarios</h2>
+        <div class="scenarios">
+          <ol id="scenario-list" class="scenario-list"></ol>
+          <article id="scenario" class="panel scenario-detail" aria-live="polite">
+            <p class="muted">Loading scenarios…</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-tables" class="view" hidden aria-labelledby="tables-heading">
+        <div class="panel">
+          <div class="toolbar">
+            <h2 id="tables-heading">Tables</h2>
+            <label class="field">
+              <span>Table</span>
+              <select id="table-select"></select>
+            </label>
+          </div>
+          <p id="table-comment" class="muted"></p>
+          <div id="table-result"></div>
+        </div>
+      </section>
+
+      <section id="view-sql" class="view" hidden aria-labelledby="sql-heading">
+        <div class="panel">
+          <div class="toolbar">
+            <h2 id="sql-heading">SQL console</h2>
+            <span class="muted small">Ctrl/⌘ + Enter to run. Changes stay until you reset.</span>
+          </div>
+          <label class="visually-hidden" for="sql-input">SQL</label>
+          <textarea id="sql-input" class="code" spellcheck="false" rows="8">
+select name, employee_count, customer_count
+from department_summary
+order by employee_count desc, name;</textarea
+          >
+          <div class="actions">
+            <button id="sql-run" type="button" class="button" disabled>Run</button>
+          </div>
+          <div id="sql-result"></div>
+        </div>
+      </section>
+
+      <section id="view-schema" class="view" hidden aria-labelledby="schema-heading">
+        <div class="panel">
+          <div class="toolbar">
+            <h2 id="schema-heading">Schema</h2>
+            <label class="field inline">
+              <input id="schema-columns" type="checkbox" />
+              <span>All tables and columns</span>
+            </label>
+          </div>
+          <p class="muted">
+            The core model: entities and the tables that link them. Tick the box to add the 13 tables that hold
+            multivalued attributes (phones, emails, addresses, ...) and every column. Generated from the database
+            catalog; column-by-column reference in
+            <a id="schema-doc-link" href="https://github.com/malfallah/Database-Project/blob/main/docs/schema.md"
+              >docs/schema.md</a
+            >.
+          </p>
+          <div id="diagram" class="diagram"><p class="muted">Loading diagram…</p></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap site-footer">
+      <p>
+        Based on a 2022 university database project by Bilal Delbani, Omar Temsah, Mohammad Al Fallah and Mohammad
+        Alizzi. All people and companies in the data are fictional. Powered by
+        <a href="https://pglite.dev">PGlite</a>.
+      </p>
+    </footer>
+  </body>
+</html>
