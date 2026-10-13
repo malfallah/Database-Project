@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: npm ci
+      - run: pip install -r requirements-dev.txt
+      - name: JavaScript (Biome)
+        run: npx biome ci .
+      - name: SQL (sqlfluff)
+        run: sqlfluff lint
+      - name: Generated docs are up to date
+        run: npm run docs:check
+
+  test-postgres:
+    name: Tests (PostgreSQL 18.3 server)
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:18.3-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Test suite
+        run: npm test
+      - name: Migrations with dbmate (up, rollback all, up again)
+        env:
+          DATABASE_URL: postgres://ci:ci@localhost:5432/dbmate_check?sslmode=disable
+          DBMATE_NO_DUMP_SCHEMA: "true"
+        run: |
+          npx dbmate create
+          npx dbmate up
+          for _ in db/migrations/*.sql; do npx dbmate rollback; done
+          npx dbmate status
+          npx dbmate up
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f db/seed.sql
+          test "$(psql "$DATABASE_URL" -tAc 'select count(*) from employee')" = "31"
+
+  test-pglite:
+    name: Tests (PGlite, as in the browser demo)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  compose:
+    name: docker compose up
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start the stack
+        run: docker compose up --detach
+      - name: Wait for migrate and seed to finish
+        run: |
+          for service in migrate seed; do
+            code=$(docker wait "$(docker compose ps --all --quiet "$service")")
+            docker compose logs "$service"
+            test "$code" = "0"
+          done
+      - name: Check the seeded database
+        run: |
+          docker compose exec -T db psql -U safehands -d safe_hands -v ON_ERROR_STOP=1 \
+            -c "select name, employee_count, customer_count from department_summary order by dept_no"
+          test "$(docker compose exec -T db psql -U safehands -d safe_hands -tAc 'select count(*) from employee')" = "31"
+      - name: Re-running is safe (seed is skipped)
+        run: |
+          docker compose up --detach
+          code=$(docker wait "$(docker compose ps --all --quiet seed)")
+          docker compose logs seed | tee seed.log
+          test "$code" = "0"
+          grep -q "seed skipped" seed.log
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down --volumes
