@@ -1,0 +1,2 @@
+# SQL linter used by CI (`sqlfluff lint`). Install with: pip install -r requirements-dev.txt
+sqlfluff==4.3.0

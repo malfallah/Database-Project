@@ -1,0 +1,30 @@
+[sqlfluff]
+dialect = postgres
+templater = raw
+max_line_length = 120
+# ST06 (select-list ordering) and RF04 (keywords such as "name" as column
+# names) are style preferences this project does not follow.
+exclude_rules = ST06, RF04
+# Lint db/seed.sql too, which is larger than the default 20 KB limit.
+large_file_skip_byte_limit = 0
+# docs/original holds the 2022 Oracle script verbatim, errors included.
+# It is excluded in .sqlfluffignore.
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 4
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = lower
