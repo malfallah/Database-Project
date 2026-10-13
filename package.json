@@ -1,0 +1,30 @@
+{
+  "name": "safe-hands-db",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Relational database for a fictional insurance company: PostgreSQL schema, migrations, seed data, scenario queries, tests and an in-browser demo.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=4",
+    "test:watch": "node --test --test-concurrency=4 --watch",
+    "lint": "biome check . && sqlfluff lint",
+    "lint:js": "biome check .",
+    "lint:sql": "sqlfluff lint",
+    "format": "biome check --write .",
+    "scenario": "node src/cli.js",
+    "build:site": "node scripts/build-site.js",
+    "serve:site": "node scripts/build-site.js && node scripts/serve.js",
+    "docs": "node scripts/docs.js",
+    "docs:check": "node scripts/docs.js --check"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@electric-sql/pglite": "0.5.8",
+    "dbmate": "2.36.0",
+    "pg": "8.23.1"
+  }
+}
