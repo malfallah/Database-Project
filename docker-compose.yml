@@ -1,0 +1,67 @@
+# Local development database: `docker compose up`.
+#
+#   db       PostgreSQL 18.3 (the same version the browser demo runs via PGlite)
+#   migrate  applies db/migrations with dbmate, then exits
+#   seed     loads db/seed.sql into an empty database, then exits
+#
+# Defaults are for a throwaway local database and Postgres listens on
+# 127.0.0.1 only. Override any of them in a .env file (see .env.example).
+
+name: safe-hands
+
+x-database-url: &database-url
+  DATABASE_URL: postgres://${POSTGRES_USER:-safehands}:${POSTGRES_PASSWORD:-safehands-local}@db:5432/${POSTGRES_DB:-safe_hands}?sslmode=disable
+
+services:
+  db:
+    image: postgres:18.3-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-safehands}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-safehands-local}
+      POSTGRES_DB: ${POSTGRES_DB:-safe_hands}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # The postgres 18 image keeps its data under /var/lib/postgresql/18/.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  migrate:
+    image: ghcr.io/amacneil/dbmate:2.36.0
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *database-url
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+      DBMATE_NO_DUMP_SCHEMA: "true"
+    volumes:
+      - ./db:/db:ro
+    command: ["--wait", "up"]
+
+  seed:
+    image: postgres:18.3-alpine
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      <<: *database-url
+    volumes:
+      - ./db/seed.sql:/seed.sql:ro
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        set -e
+        if [ "$$(psql "$$DATABASE_URL" -tAc 'select count(*) from employee')" = "0" ]; then
+          psql "$$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f /seed.sql
+          echo "Seed data loaded."
+        else
+          echo "Database already has data; seed skipped."
+        fi
+
+volumes:
+  pgdata:
