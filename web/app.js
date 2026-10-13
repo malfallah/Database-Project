@@ -275,24 +275,28 @@ async function runConsole() {
 // Schema diagram (Mermaid, loaded on first use)
 // ---------------------------------------------------------------------------
 
-let mermaidModule;
+let mermaidPromise;
+function loadMermaid() {
+  if (!mermaidPromise) {
+    mermaidPromise = import(MERMAID_URL).then((m) => {
+      const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+      m.default.initialize({
+        startOnLoad: false,
+        theme: dark ? 'dark' : 'neutral',
+        securityLevel: 'strict',
+        er: { useMaxWidth: true },
+      });
+      return m.default;
+    });
+  }
+  return mermaidPromise;
+}
+
 async function renderDiagram() {
   const target = $('diagram');
   try {
     const file = $('schema-columns').checked ? 'er/full.mmd' : 'er/core.mmd';
-    const [source, mermaid] = await Promise.all([
-      fetchText(file),
-      (mermaidModule ??= import(MERMAID_URL).then((m) => {
-        const dark = matchMedia('(prefers-color-scheme: dark)').matches;
-        m.default.initialize({
-          startOnLoad: false,
-          theme: dark ? 'dark' : 'neutral',
-          securityLevel: 'strict',
-          er: { useMaxWidth: true },
-        });
-        return m.default;
-      })),
-    ]);
+    const [source, mermaid] = await Promise.all([fetchText(file), loadMermaid()]);
     // Laid out left to right, the core diagram is about as wide as the page
     // and readable at full size; top to bottom it is five times wider than
     // tall and its labels shrink to a third when fitted.
