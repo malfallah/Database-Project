@@ -1,0 +1,12 @@
+# Normalise line endings to LF in the repository on every platform.
+* text=auto eol=lf
+
+# Binary files
+*.pdf binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+
+# Keep the archived coursework out of language statistics.
+docs/original/** linguist-documentation

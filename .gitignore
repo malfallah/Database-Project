@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output (GitHub Pages site)
+_site/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python tooling (sqlfluff)
+.venv/
+__pycache__/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
