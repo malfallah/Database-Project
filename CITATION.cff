@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it as below."
+type: software
+title: "Safe Hands DB: a relational database for an insurance company"
+abstract: >-
+  PostgreSQL schema, migrations, seed data, ten business-scenario queries,
+  tests and an in-browser demo for a fictional insurance company. Rebuilt from
+  a 2022 university database design project, with every defect of the
+  original documented and fixed.
+authors:
+  - family-names: Al Fallah
+    given-names: Mohammad
+version: 1.0.0
+date-released: 2026-10-14
+license: MIT
+repository-code: "https://github.com/malfallah/Database-Project"
+url: "https://malfallah.github.io/Database-Project/"
+keywords:
+  - database design
+  - postgresql
+  - er diagram
+  - normalization
+  - sql
+  - pglite
+references:
+  - type: report
+    title: "Database Design for Insurance Company"
+    authors:
+      - family-names: Delbani
+        given-names: Bilal
+      - family-names: Temsah
+        given-names: Omar
+      - family-names: Al Fallah
+        given-names: Mohammad
+      - family-names: Alizzi
+        given-names: Mohammad
+    institution:
+      name: Lebanese American University
+    year: 2022
+    month: 12

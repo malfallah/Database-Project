@@ -1,0 +1,31 @@
+Safe Hands DB
+Copyright (c) 2023-2026 Mohammad Al Fallah
+
+This project grew out of a university database course project, "Database Design
+for Insurance Company" (Lebanese American University, December 2022), written by:
+
+  Bilal Delbani
+  Omar Temsah
+  Mohammad Al Fallah
+  Mohammad Alizzi
+
+The entity-relationship design, the relational mapping, the sample data and the
+ten business scenarios in this repository are derived from that joint work.
+The original report is included unchanged in docs/original/ for reference.
+
+The MIT License in LICENSE applies to the code, SQL and documentation written for
+this repository. The original report (docs/original/safe-hands-report-2022.pdf)
+is the joint work of its four authors; please credit all of them if you reuse it.
+
+All people, companies, addresses, phone numbers and records in the data are
+fictional. Email addresses use the reserved example.com domain (RFC 2606).
+
+Third-party software used (not redistributed in this repository, except as part
+of the built demo site):
+  PostgreSQL       PostgreSQL License         https://www.postgresql.org/
+  PGlite           Apache-2.0 / PostgreSQL    https://pglite.dev/
+  dbmate           MIT                        https://github.com/amacneil/dbmate
+  node-postgres    MIT                        https://node-postgres.com/
+  Mermaid          MIT                        https://mermaid.js.org/
+  Biome            MIT / Apache-2.0           https://biomejs.dev/
+  SQLFluff         MIT                        https://sqlfluff.com/
