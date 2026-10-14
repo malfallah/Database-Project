@@ -9,10 +9,10 @@ that runs the whole database in your browser.
 [![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**[Live demo →](https://malfallah.github.io/Database-Project/)** (PostgreSQL 18 compiled to
+**[Live demo →](https://malfallah.github.io/safe-hands-db/)** (PostgreSQL 18 compiled to
 WebAssembly; nothing is sent to a server)
 
-<a href="https://malfallah.github.io/Database-Project/">
+<a href="https://malfallah.github.io/safe-hands-db/">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/demo-dark.png">
     <img alt="The demo running scenario 5: the SQL, a note on what was fixed, and the rows it changed" src="docs/images/demo-light.png" width="840">
